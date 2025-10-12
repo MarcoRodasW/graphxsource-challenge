@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiOkResponse,
@@ -32,6 +32,19 @@ export class OrdersController {
   })
   async getOrders() {
     return this.ordersRepository.getOrders();
+  }
+
+  @Get('/:id')
+  @ApiOperation({
+    summary: 'Obtener una Orden por ID',
+    description: 'Obtener los detalles de una orden específica por su ID',
+  })
+  @ApiOkResponse({
+    description: 'Orden obtenida correctamente',
+    type: OrderDTO,
+  })
+  async getOrderById(@Param('id') id: string) {
+    return this.ordersRepository.getOrderById(id);
   }
 
   @Post('/')
