@@ -5,12 +5,14 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { CustomZodValidationPipe } from './common/pipes/custom-zod-validation.pipe';
 import { ResponseInterceptor } from './common/interceptors/response.interceptors';
 import { HttpExceptionFilter } from './common/filters/http-execption.filter';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: '.env.local',
     }),
+    OrdersModule,
   ],
   controllers: [],
   providers: [
