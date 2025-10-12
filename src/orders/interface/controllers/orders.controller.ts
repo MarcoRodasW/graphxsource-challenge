@@ -1,5 +1,10 @@
 import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   type IOrdersRepository,
   ORDERS_REPOSITORY,
@@ -34,7 +39,7 @@ export class OrdersController {
     summary: 'Crear una nueva Orden',
     description: 'Crear una nueva orden con los datos proporcionados',
   })
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     description: 'Orden creada correctamente',
     type: OrderDTO,
   })
