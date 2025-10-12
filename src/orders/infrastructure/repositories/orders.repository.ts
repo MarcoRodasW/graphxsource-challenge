@@ -4,12 +4,17 @@ import { IOrdersRepository } from 'src/orders/domain/orders.repository.interface
 import {
   CreateOrder,
   Order,
+  OrderStatus,
   UpdateOrder,
 } from 'src/orders/interface/dtos/orders.dto';
+import { ChangeOrderStatusUseCase } from 'src/orders/application/use-cases/change-order-status';
 
 @Injectable()
 export class OrdersRepository implements IOrdersRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly changeOrderStatusUseCase: ChangeOrderStatusUseCase,
+  ) {}
 
   async createOrder(data: CreateOrder): Promise<Order> {
     return this.prisma.order.create({
@@ -49,6 +54,28 @@ export class OrdersRepository implements IOrdersRepository {
     }
     await this.prisma.order.delete({
       where: { id: order.id },
+    });
+  }
+
+  async changeOrderStatus(
+    id: string,
+    orderStatus: OrderStatus,
+  ): Promise<Order> {
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+    });
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    this.changeOrderStatusUseCase.validateTransition(
+      order.orderStatus as OrderStatus,
+      orderStatus,
+    );
+
+    return this.prisma.order.update({
+      where: { id: order.id },
+      data: { orderStatus },
     });
   }
 }

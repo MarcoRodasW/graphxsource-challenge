@@ -18,7 +18,13 @@ import {
   type IOrdersRepository,
   ORDERS_REPOSITORY,
 } from 'src/orders/domain/orders.repository.interface';
-import { CreateOrderDTO, OrderDTO, UpdateOrderDTO } from '../dtos/orders.dto';
+import {
+  CreateOrderDTO,
+  OrderDTO,
+  OrderStatus,
+  UpdateOrderDTO,
+  UpdateOrderStatusDTO,
+} from '../dtos/orders.dto';
 import { ZodSerializerDto } from 'nestjs-zod';
 
 @ApiTags('orders')
@@ -85,6 +91,26 @@ export class OrdersController {
     @Body() updateOrderDTO: UpdateOrderDTO,
   ) {
     return this.ordersRepository.updateOrder(id, updateOrderDTO);
+  }
+
+  @Put('/changeStatus/:id')
+  @ApiOperation({
+    summary: 'Actualizar el estado de una Orden por ID',
+    description: 'Actualizar el estado de una orden específica por su ID',
+  })
+  @ApiOkResponse({
+    description: 'Estado de la orden actualizado correctamente',
+    type: OrderDTO,
+  })
+  @ZodSerializerDto(OrderDTO)
+  async updateOrderStatus(
+    @Param('id') id: string,
+    @Body() updateOrderStatusDTO: UpdateOrderStatusDTO,
+  ) {
+    return this.ordersRepository.changeOrderStatus(
+      id,
+      updateOrderStatusDTO.orderStatus as OrderStatus,
+    );
   }
 
   @Delete('/:id')
