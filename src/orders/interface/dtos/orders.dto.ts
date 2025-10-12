@@ -27,10 +27,14 @@ export const OrderDTOSchema = CreateOrderDTOSchema.extend({
   id: z.uuid(),
 });
 
+export const UpdateOrderDTOSchema = CreateOrderDTOSchema.partial();
+
 //Zod Parser to OpenAPI standard
 export class CreateOrderDTO extends createZodDto(CreateOrderDTOSchema) {}
 export class OrderDTO extends createZodDto(OrderDTOSchema) {}
+export class UpdateOrderDTO extends createZodDto(UpdateOrderDTOSchema) {}
 
 //Zod Types
 export type CreateOrder = z.infer<typeof CreateOrderDTOSchema>;
 export type Order = z.infer<typeof OrderDTOSchema>;
+export type UpdateOrder = z.infer<typeof UpdateOrderDTOSchema>;

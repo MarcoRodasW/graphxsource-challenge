@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiOkResponse,
@@ -9,7 +18,7 @@ import {
   type IOrdersRepository,
   ORDERS_REPOSITORY,
 } from 'src/orders/domain/orders.repository.interface';
-import { CreateOrderDTO, OrderDTO } from '../dtos/orders.dto';
+import { CreateOrderDTO, OrderDTO, UpdateOrderDTO } from '../dtos/orders.dto';
 import { ZodSerializerDto } from 'nestjs-zod';
 
 @ApiTags('orders')
@@ -59,5 +68,34 @@ export class OrdersController {
   @ZodSerializerDto(OrderDTO)
   async createOrder(@Body() createOrderDTO: CreateOrderDTO) {
     return this.ordersRepository.createOrder(createOrderDTO);
+  }
+
+  @Put('/:id')
+  @ApiOperation({
+    summary: 'Actualizar una Orden por ID',
+    description: 'Actualizar los detalles de una orden específica por su ID',
+  })
+  @ApiOkResponse({
+    description: 'Orden actualizada correctamente',
+    type: OrderDTO,
+  })
+  @ZodSerializerDto(OrderDTO)
+  async updateOrder(
+    @Param('id') id: string,
+    @Body() updateOrderDTO: UpdateOrderDTO,
+  ) {
+    return this.ordersRepository.updateOrder(id, updateOrderDTO);
+  }
+
+  @Delete('/:id')
+  @ApiOperation({
+    summary: 'Eliminar una Orden por ID',
+    description: 'Eliminar una orden específica por su ID',
+  })
+  @ApiOkResponse({
+    description: 'Orden eliminada correctamente',
+  })
+  async deleteOrder(@Param('id') id: string) {
+    return this.ordersRepository.deleteOrder(id);
   }
 }

@@ -1,9 +1,11 @@
-import { CreateOrder, Order } from '../interface/dtos/orders.dto';
+import { CreateOrder, Order, UpdateOrder } from '../interface/dtos/orders.dto';
 
 export interface IOrdersRepository {
   createOrder(data: CreateOrder): Promise<Order>;
   getOrders(): Promise<Order[]>;
   getOrderById(id: string): Promise<Order | null>;
+  updateOrder(id: string, data: UpdateOrder): Promise<Order>;
+  deleteOrder(id: string): Promise<void>;
 }
 
 export const ORDERS_REPOSITORY = Symbol('IOrdersRepository');
