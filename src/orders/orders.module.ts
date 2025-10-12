@@ -4,6 +4,7 @@ import { ORDERS_REPOSITORY } from './domain/orders.repository.interface';
 import { OrdersRepository } from './infrastructure/repositories/orders.repository';
 import { PrismaService } from 'src/common/services/prisma.service';
 import { ChangeOrderStatusUseCase } from './application/use-cases/change-order-status';
+import { ValidateOrderUpdateUseCase } from './application/use-cases/validate-order-update';
 
 @Module({
   imports: [],
@@ -11,6 +12,7 @@ import { ChangeOrderStatusUseCase } from './application/use-cases/change-order-s
   providers: [
     PrismaService,
     ChangeOrderStatusUseCase,
+    ValidateOrderUpdateUseCase,
     {
       provide: ORDERS_REPOSITORY,
       useClass: OrdersRepository,

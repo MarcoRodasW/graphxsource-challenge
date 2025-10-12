@@ -8,7 +8,7 @@ export class ChangeOrderStatusUseCase {
   private readonly validTransitions: ValidTransitions = {
     [OrderStatus.RECEIVED]: [OrderStatus.PROCESSING, OrderStatus.APPROVED],
     [OrderStatus.PROCESSING]: [OrderStatus.APPROVED],
-    [OrderStatus.APPROVED]: [OrderStatus.IN_PRODUCTION],
+    [OrderStatus.APPROVED]: [OrderStatus.PROCESSING, OrderStatus.IN_PRODUCTION],
     [OrderStatus.IN_PRODUCTION]: [OrderStatus.SHIPPED],
     [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED],
     [OrderStatus.DELIVERED]: [],
