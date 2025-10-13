@@ -32,7 +32,7 @@ export const MugDetailSchema = z.object({
   capacity: z
     .number()
     .min(10, { error: 'La capacidad mínima es de 10ml.' })
-    .max(100, { error: 'La capacidad máxima es de 2000ml.' }),
+    .max(100, { error: 'La capacidad máxima es de 100ml.' }),
   color: z
     .string()
     .min(1, 'Es requerido ingresar un color.')
