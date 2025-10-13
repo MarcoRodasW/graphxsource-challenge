@@ -8,6 +8,7 @@ import {
   OrderStatus,
   UpdateOrder,
 } from 'src/orders/interface/dtos/orders.dto';
+import type { OrderStatusHistory } from 'src/orders/interface/dtos/order-status-history.dto';
 import { ChangeOrderStatusUseCase } from 'src/orders/application/use-cases/change-order-status';
 import { ValidateOrderUpdateUseCase } from 'src/orders/application/use-cases/validate-order-update';
 import type { IProductsRepository } from 'src/products/domain/products.repository.interface';
@@ -112,6 +113,20 @@ export class OrdersRepository implements IOrdersRepository {
       });
 
       return updatedOrder;
+    });
+  }
+
+  async getOrderStatusHistory(orderId: string): Promise<OrderStatusHistory[]> {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return this.prisma.orderStatusHistory.findMany({
+      where: { orderId },
+      orderBy: { changedAt: 'asc' },
     });
   }
 }

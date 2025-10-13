@@ -57,6 +57,9 @@ export const UpdateOrderDTOSchema = z.object({
     .max(100, {
       error: 'Nombre del cliente debe tener máximo 100 caracteres',
     }),
+  productId: z.uuid({
+    message: 'El ID del producto debe ser un UUID válido',
+  }),
   comments: z
     .string()
     .max(255, { error: 'Los comentarios deben tener máximo 255 caracteres' })

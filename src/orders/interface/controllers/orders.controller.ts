@@ -26,6 +26,7 @@ import {
   UpdateOrderStatusDTO,
 } from '../dtos/orders.dto';
 import { ZodSerializerDto } from 'nestjs-zod';
+import { OrderStatusHistoryDTO } from '../dtos/order-status-history.dto';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -123,5 +124,20 @@ export class OrdersController {
   })
   async deleteOrder(@Param('id') id: string) {
     return this.ordersRepository.deleteOrder(id);
+  }
+
+  @Get('/:id/status-history')
+  @ApiOperation({
+    summary: 'Obtener el historial de estados de una Orden',
+    description:
+      'Obtener el historial completo de cambios de estado de una orden específica',
+  })
+  @ApiOkResponse({
+    description: 'Historial de estados obtenido correctamente',
+    isArray: true,
+    type: OrderStatusHistoryDTO,
+  })
+  getOrderStatusHistory(@Param('id') id: string) {
+    return this.ordersRepository.getOrderStatusHistory(id);
   }
 }
