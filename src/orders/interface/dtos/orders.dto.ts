@@ -30,7 +30,12 @@ export const CreateOrderDTOSchema = z.object({
     .max(100, {
       error: 'Nombre del cliente debe tener máximo 100 caracteres',
     }),
-  orderStatus: z.literal('RECEIVED').default('RECEIVED'),
+  orderStatus: OrderStatusEnumSchema.extract(['RECEIVED']).default('RECEIVED'),
+  comments: z
+    .string()
+    .max(255, { error: 'Los comentarios deben tener máximo 255 caracteres' })
+    .nullable()
+    .optional(),
 });
 
 export const OrderDTOSchema = CreateOrderDTOSchema.extend({
@@ -49,10 +54,19 @@ export const UpdateOrderDTOSchema = z.object({
     .max(100, {
       error: 'Nombre del cliente debe tener máximo 100 caracteres',
     }),
+  comments: z
+    .string()
+    .max(255, { error: 'Los comentarios deben tener máximo 255 caracteres' })
+    .nullable()
+    .optional(),
 });
 
 export const UpdateOrderStatusDTOSchema = z.object({
   orderStatus: OrderStatusEnumSchema,
+  comments: z
+    .string()
+    .max(255, { error: 'Los comentarios deben tener máximo 255 caracteres' })
+    .nullable(),
 });
 
 //Zod Parser to OpenAPI standard

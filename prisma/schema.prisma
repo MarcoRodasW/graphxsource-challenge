@@ -19,6 +19,7 @@ model Order {
   id         String      @id @default(uuid())
   client     String      @db.VarChar(255)
   orderStatus OrderStatus @default(RECEIVED)
+  comments   String?     @db.VarChar(255)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
