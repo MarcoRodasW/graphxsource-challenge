@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -72,5 +73,17 @@ export class ProductsController {
   })
   getProductById(@Param('id') id: string) {
     return this.productsRepository.getProductById(id);
+  }
+
+  @Delete('/:id')
+  @ApiOperation({
+    summary: 'Eliminar un Producto por ID',
+    description: 'Eliminar un producto específico utilizando su ID',
+  })
+  @ApiOkResponse({
+    description: 'Producto eliminado correctamente',
+  })
+  deleteProduct(@Param('id') id: string) {
+    return this.productsRepository.deleteProduct(id);
   }
 }

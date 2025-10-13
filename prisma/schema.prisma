@@ -56,7 +56,7 @@ enum ProductType {
 model TshirtDetails {
   id        Int      @id @default(autoincrement())
   productId String   @unique
-  product   Products @relation(fields: [productId], references: [id])
+  product   Products @relation(fields: [productId], references: [id], onDelete: Cascade)
   size      String   @db.VarChar(5)
   color     String   @db.VarChar(50)
 }
@@ -64,7 +64,7 @@ model TshirtDetails {
 model MugDetails {
   id        Int      @id @default(autoincrement())
   productId String   @unique
-  product   Products @relation(fields: [productId], references: [id])
+  product   Products @relation(fields: [productId], references: [id], onDelete: Cascade)
   capacity  Int
   color     String   @db.VarChar(50)
 }
@@ -72,7 +72,7 @@ model MugDetails {
 model PosterDetails {
   id        Int      @id @default(autoincrement())
   productId String   @unique
-  product   Products @relation(fields: [productId], references: [id])
+  product   Products @relation(fields: [productId], references: [id], onDelete: Cascade)
   width     Float
   height    Float
   material  String   @db.VarChar(100)

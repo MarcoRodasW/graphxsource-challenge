@@ -76,6 +76,18 @@ export class ProductsRepository implements IProductsRepository {
         posterDetails: true,
       },
     });
+
+    if (!product) {
+      throw new BadRequestException('Producto no encontrado.');
+    }
     return product;
+  }
+
+  async deleteProduct(id: string): Promise<void> {
+    const product = await this.prisma.products.findUnique({ where: { id } });
+    if (!product) {
+      throw new BadRequestException('Producto no encontrado.');
+    }
+    await this.prisma.products.delete({ where: { id: product.id } });
   }
 }
