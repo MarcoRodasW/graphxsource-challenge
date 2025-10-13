@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id                 String               @id @default(uuid())
+  client             String               @db.VarChar(255)
+  product            Products             @relation(fields: [productId], references: [id])
+  productId          String
+  orderStatus        OrderStatus          @default(RECEIVED)
+  comments           String?              @db.VarChar(255)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  OrderStatusHistory OrderStatusHistory[]
+}
+
+enum OrderStatus {
+  RECEIVED
+  PROCESSING
+  APPROVED
+  IN_PRODUCTION
+  SHIPPED
+  DELIVERED
+}
+
+model OrderStatusHistory {
+  id         String       @id @default(uuid())
+  order      Order        @relation(fields: [orderId], references: [id])
+  orderId    String
+  fromStatus OrderStatus?
+  toStatus   OrderStatus
+  changedAt  DateTime     @default(now())
+
+  @@index([orderId])
+}
+
+model Products {
+  id          String      @id @default(uuid())
+  sku         String      @unique @db.VarChar(255)
+  name        String      @db.VarChar(255)
+  price       Float
+  description String?     @db.VarChar(255)
+  productType ProductType @default(TSHIRT)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  tshirtDetails TshirtDetails?
+  mugDetails    MugDetails?
+  posterDetails PosterDetails?
+  Order         Order[]
+}
+
+enum ProductType {
+  TSHIRT
+  MUG
+  POSTER
+}
+
+model TshirtDetails {
+  id        Int      @id @default(autoincrement())
+  productId String   @unique
+  product   Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size      String   @db.VarChar(5)
+  color     String   @db.VarChar(50)
+}
+
+model MugDetails {
+  id        Int      @id @default(autoincrement())
+  productId String   @unique
+  product   Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  capacity  Int
+  color     String   @db.VarChar(50)
+}
+
+model PosterDetails {
+  id        Int      @id @default(autoincrement())
+  productId String   @unique
+  product   Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  width     Float
+  height    Float
+  material  String   @db.VarChar(100)
+}
