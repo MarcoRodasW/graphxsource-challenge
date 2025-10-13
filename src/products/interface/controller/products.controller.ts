@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Inject, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiOkResponse,
@@ -51,5 +59,18 @@ export class ProductsController {
   @ZodSerializerDto(ProductDTO)
   createProduct(@Body() createProductDTO: CreateProductDTO) {
     return this.productsRepository.createProduct(createProductDTO);
+  }
+
+  @Get('/:id')
+  @ApiOperation({
+    summary: 'Obtener un Producto por ID',
+    description: 'Obtener un producto específico utilizando su ID',
+  })
+  @ApiOkResponse({
+    description: 'Producto obtenido correctamente',
+    type: ProductDTO,
+  })
+  getProductById(@Param('id') id: string) {
+    return this.productsRepository.getProductById(id);
   }
 }
