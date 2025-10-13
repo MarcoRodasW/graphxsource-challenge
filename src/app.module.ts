@@ -6,6 +6,7 @@ import { CustomZodValidationPipe } from './common/pipes/custom-zod-validation.pi
 import { ResponseInterceptor } from './common/interceptors/response.interceptors';
 import { HttpExceptionFilter } from './common/filters/http-execption.filter';
 import { OrdersModule } from './orders/orders.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { OrdersModule } from './orders/orders.module';
       envFilePath: '.env.local',
     }),
     OrdersModule,
+    ProductsModule,
   ],
   controllers: [],
   providers: [
