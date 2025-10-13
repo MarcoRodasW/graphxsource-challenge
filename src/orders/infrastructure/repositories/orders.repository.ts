@@ -51,6 +51,9 @@ export class OrdersRepository implements IOrdersRepository {
   async getOrderById(id: string): Promise<Order | null> {
     return this.prisma.order.findUnique({
       where: { id },
+      include: {
+        product: true,
+      },
     });
   }
 
