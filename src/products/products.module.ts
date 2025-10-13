@@ -12,5 +12,6 @@ import { ProductsController } from './interface/controller/products.controller';
     { provide: PRODUCTS_REPOSITORY, useClass: ProductsRepository },
   ],
   controllers: [ProductsController],
+  exports: [PRODUCTS_REPOSITORY],
 })
 export class ProductsModule {}

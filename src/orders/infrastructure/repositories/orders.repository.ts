@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/common/services/prisma.service';
 import { IOrdersRepository } from 'src/orders/domain/orders.repository.interface';
@@ -10,6 +10,8 @@ import {
 } from 'src/orders/interface/dtos/orders.dto';
 import { ChangeOrderStatusUseCase } from 'src/orders/application/use-cases/change-order-status';
 import { ValidateOrderUpdateUseCase } from 'src/orders/application/use-cases/validate-order-update';
+import type { IProductsRepository } from 'src/products/domain/products.repository.interface';
+import { PRODUCTS_REPOSITORY } from 'src/products/domain/products.repository.interface';
 
 @Injectable()
 export class OrdersRepository implements IOrdersRepository {
@@ -17,11 +19,27 @@ export class OrdersRepository implements IOrdersRepository {
     private readonly prisma: PrismaService,
     private readonly changeOrderStatusUseCase: ChangeOrderStatusUseCase,
     private readonly validateOrderUpdateUseCase: ValidateOrderUpdateUseCase,
+    @Inject(PRODUCTS_REPOSITORY)
+    private readonly productsRepository: IProductsRepository,
   ) {}
 
   async createOrder(data: CreateOrder): Promise<Order> {
-    return this.prisma.order.create({
-      data,
+    // Validate product exists
+    await this.productsRepository.getProductById(data.productId);
+
+    // Create order with initial history record in transaction
+    return await this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.create({ data });
+
+      await tx.orderStatusHistory.create({
+        data: {
+          orderId: order.id,
+          fromStatus: null,
+          toStatus: order.orderStatus,
+        },
+      });
+
+      return order;
     });
   }
 
@@ -79,9 +97,21 @@ export class OrdersRepository implements IOrdersRepository {
       orderStatus,
     );
 
-    return this.prisma.order.update({
-      where: { id: order.id },
-      data: { orderStatus },
+    return await this.prisma.$transaction(async (tx) => {
+      const updatedOrder = await tx.order.update({
+        where: { id: order.id },
+        data: { orderStatus },
+      });
+
+      await tx.orderStatusHistory.create({
+        data: {
+          orderId: id,
+          fromStatus: order.orderStatus,
+          toStatus: orderStatus,
+        },
+      });
+
+      return updatedOrder;
     });
   }
 }

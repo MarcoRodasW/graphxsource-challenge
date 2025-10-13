@@ -30,6 +30,9 @@ export const CreateOrderDTOSchema = z.object({
     .max(100, {
       error: 'Nombre del cliente debe tener máximo 100 caracteres',
     }),
+  productId: z.uuid({
+    message: 'El ID del producto debe ser un UUID válido',
+  }),
   orderStatus: OrderStatusEnumSchema.extract(['RECEIVED']).default('RECEIVED'),
   comments: z
     .string()

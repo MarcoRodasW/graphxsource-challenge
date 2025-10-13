@@ -5,9 +5,10 @@ import { OrdersRepository } from './infrastructure/repositories/orders.repositor
 import { PrismaService } from 'src/common/services/prisma.service';
 import { ChangeOrderStatusUseCase } from './application/use-cases/change-order-status';
 import { ValidateOrderUpdateUseCase } from './application/use-cases/validate-order-update';
+import { ProductsModule } from 'src/products/products.module';
 
 @Module({
-  imports: [],
+  imports: [ProductsModule],
   controllers: [OrdersController],
   providers: [
     PrismaService,
