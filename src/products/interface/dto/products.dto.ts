@@ -72,9 +72,16 @@ export const CreateProductDTOSchema = z.object({
     }),
   price: z.number().min(1, { error: 'El precio debe ser al menos 1' }),
   productType: ProductTypeEnumSchema,
-  tshirtDetails: TshirtDetailSchema.optional(),
-  mugDetails: MugDetailSchema.optional(),
-  posterDetails: PosterDetailSchema.optional(),
+  description: z
+    .string()
+    .max(255, {
+      error: 'La descripción debe tener máximo 255 caracteres',
+    })
+    .nullable()
+    .optional(),
+  tshirtDetails: TshirtDetailSchema.nullable().optional(),
+  mugDetails: MugDetailSchema.nullable().optional(),
+  posterDetails: PosterDetailSchema.nullable().optional(),
 });
 
 export const ProductDTOSchema = CreateProductDTOSchema.extend({
@@ -90,9 +97,19 @@ export const ProductDTOSchema = CreateProductDTOSchema.extend({
   }).nullable(),
 });
 
+export const ProductsQueryParamsSchema = z.object({
+  productType: ProductTypeEnumSchema.optional(),
+  name: z.string().optional(),
+  sku: z.string().optional(),
+});
+
 //Zod Parser to OpenAPI standard
 export class CreateProductDTO extends createZodDto(CreateProductDTOSchema) {}
 export class ProductDTO extends createZodDto(ProductDTOSchema) {}
+export class ProductsQueryParamsDTO extends createZodDto(
+  ProductsQueryParamsSchema,
+) {}
 //Zod Types
 export type CreateProduct = z.infer<typeof CreateProductDTOSchema>;
 export type Product = z.infer<typeof ProductDTOSchema>;
+export type ProductsQueryParams = z.infer<typeof ProductsQueryParamsSchema>;
