@@ -1,14 +1,16 @@
 import {
   CreateOrder,
+  GetOrdersQuery,
   Order,
   OrderStatus,
   UpdateOrder,
 } from '../interface/dtos/orders.dto';
 import { OrderStatusHistory } from '../interface/dtos/order-status-history.dto';
+import { PaginationResponse } from 'src/common/types/api-reponse.types';
 
 export interface IOrdersRepository {
   createOrder(data: CreateOrder): Promise<Order>;
-  getOrders(): Promise<Order[]>;
+  getOrders(query: GetOrdersQuery): Promise<PaginationResponse<Order>>;
   getOrderById(id: string): Promise<Order | null>;
   updateOrder(id: string, data: UpdateOrder): Promise<Order>;
   deleteOrder(id: string): Promise<void>;

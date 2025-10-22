@@ -1,4 +1,5 @@
 import { createZodDto } from 'nestjs-zod';
+import { ProductTypeEnumSchema } from 'src/products/interface/dto/products.dto';
 import { z } from 'zod';
 
 export enum OrderStatus {
@@ -87,7 +88,19 @@ export class UpdateOrderStatusDTO extends createZodDto(
 ) {}
 
 //Zod Types
+export const GetOrdersQueryDTOSchema = z.object({
+  orderId: z.string().optional(),
+  orderStatus: OrderStatusEnumSchema.optional(),
+  productType: ProductTypeEnumSchema.optional(),
+  client: z.string().optional(),
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(10),
+});
+
+export class GetOrdersQueryDTO extends createZodDto(GetOrdersQueryDTOSchema) {}
+
 export type CreateOrder = z.infer<typeof CreateOrderDTOSchema>;
 export type Order = z.infer<typeof OrderDTOSchema>;
 export type UpdateOrder = z.infer<typeof UpdateOrderDTOSchema>;
 export type UpdateOrderStatus = z.infer<typeof UpdateOrderStatusDTOSchema>;
+export type GetOrdersQuery = z.infer<typeof GetOrdersQueryDTOSchema>;

@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -20,6 +21,7 @@ import {
 } from 'src/orders/domain/orders.repository.interface';
 import {
   CreateOrderDTO,
+  GetOrdersQueryDTO,
   OrderDTO,
   OrderStatus,
   UpdateOrderDTO,
@@ -43,11 +45,9 @@ export class OrdersController {
   })
   @ApiOkResponse({
     description: 'Lista de ordenes obtenida correctamente',
-    isArray: true,
-    type: OrderDTO,
   })
-  async getOrders() {
-    return this.ordersRepository.getOrders();
+  async getOrders(@Query() query: GetOrdersQueryDTO) {
+    return this.ordersRepository.getOrders(query);
   }
 
   @Get('/:id')

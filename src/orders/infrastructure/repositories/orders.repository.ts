@@ -4,6 +4,7 @@ import { PrismaService } from 'src/common/services/prisma.service';
 import { IOrdersRepository } from 'src/orders/domain/orders.repository.interface';
 import {
   CreateOrder,
+  GetOrdersQuery,
   Order,
   OrderStatus,
   UpdateOrder,
@@ -14,6 +15,8 @@ import { ValidateOrderUpdateUseCase } from 'src/orders/application/use-cases/val
 import type { IProductsRepository } from 'src/products/domain/products.repository.interface';
 import { PRODUCTS_REPOSITORY } from 'src/products/domain/products.repository.interface';
 import { OrderIdGeneratorService } from 'src/orders/application/services/order-id-generator.service';
+import type { PaginationResponse } from 'src/common/types/api-reponse.types';
+import { ResponseUtils } from 'src/common/utils/response.utils';
 
 @Injectable()
 export class OrdersRepository implements IOrdersRepository {
@@ -78,8 +81,34 @@ export class OrdersRepository implements IOrdersRepository {
     );
   }
 
-  async getOrders(): Promise<Order[]> {
-    return this.prisma.order.findMany();
+  async getOrders(query: GetOrdersQuery): Promise<PaginationResponse<Order>> {
+    const { orderId, orderStatus, productType, client, page, limit } = query;
+
+    const where = {
+      ...(orderId && {
+        orderId: { contains: orderId, mode: 'insensitive' as const },
+      }),
+      ...(orderStatus && { orderStatus }),
+      ...(client && {
+        client: { contains: client, mode: 'insensitive' as const },
+      }),
+      ...(productType && { product: { productType } }),
+    };
+
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        include: { product: true },
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    return ResponseUtils.paginated(data, total, page, limit);
   }
 
   async getOrderById(id: string): Promise<Order | null> {
