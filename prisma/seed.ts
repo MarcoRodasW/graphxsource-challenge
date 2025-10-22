@@ -140,6 +140,7 @@ async function main() {
   // Order 1: RECEIVED status
   const order1 = await prisma.order.create({
     data: {
+      orderId: 'ORD-20241021-0001',
       client: 'John Doe',
       productId: tshirt1.id,
       orderStatus: OrderStatus.RECEIVED,
@@ -158,6 +159,7 @@ async function main() {
   // Order 2: PROCESSING status
   const order2 = await prisma.order.create({
     data: {
+      orderId: 'ORD-20241021-0002',
       client: 'Jane Smith',
       productId: mug1.id,
       orderStatus: OrderStatus.PROCESSING,
@@ -183,6 +185,7 @@ async function main() {
   // Order 3: APPROVED status
   const order3 = await prisma.order.create({
     data: {
+      orderId: 'ORD-20241021-0003',
       client: 'Bob Johnson',
       productId: poster1.id,
       orderStatus: OrderStatus.APPROVED,
@@ -212,6 +215,7 @@ async function main() {
   // Order 4: IN_PRODUCTION status
   const order4 = await prisma.order.create({
     data: {
+      orderId: 'ORD-20241021-0004',
       client: 'Alice Williams',
       productId: tshirt2.id,
       orderStatus: OrderStatus.IN_PRODUCTION,
@@ -247,6 +251,7 @@ async function main() {
   // Order 5: SHIPPED status
   const order5 = await prisma.order.create({
     data: {
+      orderId: 'ORD-20241021-0005',
       client: 'Charlie Brown',
       productId: mug2.id,
       orderStatus: OrderStatus.SHIPPED,
@@ -287,6 +292,7 @@ async function main() {
   // Order 6: DELIVERED status
   const order6 = await prisma.order.create({
     data: {
+      orderId: 'ORD-20241021-0006',
       client: 'Diana Prince',
       productId: poster2.id,
       orderStatus: OrderStatus.DELIVERED,
@@ -331,6 +337,7 @@ async function main() {
   // Additional orders for variety
   await prisma.order.create({
     data: {
+      orderId: 'ORD-20241021-0007',
       client: 'Eve Martinez',
       productId: tshirt3.id,
       orderStatus: OrderStatus.RECEIVED,
@@ -340,6 +347,7 @@ async function main() {
 
   await prisma.order.create({
     data: {
+      orderId: 'ORD-20241021-0008',
       client: 'Frank Castle',
       productId: mug1.id,
       orderStatus: OrderStatus.PROCESSING,
@@ -363,6 +371,6 @@ main()
     console.error('❌ Error during seeding:', e);
     process.exit(1);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
+  .finally(() => {
+    void prisma.$disconnect();
   });

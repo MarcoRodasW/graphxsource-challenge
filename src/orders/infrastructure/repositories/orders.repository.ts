@@ -13,6 +13,7 @@ import { ChangeOrderStatusUseCase } from 'src/orders/application/use-cases/chang
 import { ValidateOrderUpdateUseCase } from 'src/orders/application/use-cases/validate-order-update';
 import type { IProductsRepository } from 'src/products/domain/products.repository.interface';
 import { PRODUCTS_REPOSITORY } from 'src/products/domain/products.repository.interface';
+import { OrderIdGeneratorService } from 'src/orders/application/services/order-id-generator.service';
 
 @Injectable()
 export class OrdersRepository implements IOrdersRepository {
@@ -22,26 +23,59 @@ export class OrdersRepository implements IOrdersRepository {
     private readonly validateOrderUpdateUseCase: ValidateOrderUpdateUseCase,
     @Inject(PRODUCTS_REPOSITORY)
     private readonly productsRepository: IProductsRepository,
+    private readonly orderIdGenerator: OrderIdGeneratorService,
   ) {}
 
   async createOrder(data: CreateOrder): Promise<Order> {
     // Validate product exists
     await this.productsRepository.getProductById(data.productId);
 
-    // Create order with initial history record in transaction
-    return await this.prisma.$transaction(async (tx) => {
-      const order = await tx.order.create({ data });
+    const maxRetries = 3;
+    let attempt = 0;
 
-      await tx.orderStatusHistory.create({
-        data: {
-          orderId: order.id,
-          fromStatus: null,
-          toStatus: order.orderStatus,
-        },
-      });
+    while (attempt < maxRetries) {
+      try {
+        // Generate correlative order ID
+        const orderId = await this.orderIdGenerator.generateOrderId();
 
-      return order;
-    });
+        // Create order with initial history record in transaction
+        return await this.prisma.$transaction(async (tx) => {
+          const order = await tx.order.create({
+            data: {
+              ...data,
+              orderId,
+            },
+          });
+
+          await tx.orderStatusHistory.create({
+            data: {
+              orderId: order.id,
+              fromStatus: null,
+              toStatus: order.orderStatus,
+            },
+          });
+
+          return order;
+        });
+      } catch (error: unknown) {
+        // Handle unique constraint violation (race condition)
+        const isPrismaError =
+          typeof error === 'object' &&
+          error !== null &&
+          'code' in error &&
+          error.code === 'P2002';
+
+        if (isPrismaError && attempt < maxRetries - 1) {
+          attempt++;
+          continue; // Retry with new ID
+        }
+        throw error;
+      }
+    }
+
+    throw new Error(
+      'Failed to generate unique order ID after multiple attempts',
+    );
   }
 
   async getOrders(): Promise<Order[]> {

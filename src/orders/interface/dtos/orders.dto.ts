@@ -43,6 +43,9 @@ export const CreateOrderDTOSchema = z.object({
 
 export const OrderDTOSchema = CreateOrderDTOSchema.extend({
   id: z.uuid(),
+  orderId: z.string().regex(/^ORD-\d{8}-\d{4}$/, {
+    message: 'Order ID must follow format ORD-YYYYMMDD-NNNN',
+  }),
   orderStatus: OrderStatusEnumSchema,
 });
 

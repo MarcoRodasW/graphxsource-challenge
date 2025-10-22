@@ -16,6 +16,7 @@ datasource db {
 
 model Order {
   id                 String               @id @default(uuid())
+  orderId            String               @unique @db.VarChar(20)
   client             String               @db.VarChar(255)
   product            Products             @relation(fields: [productId], references: [id])
   productId          String
@@ -24,6 +25,8 @@ model Order {
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
   OrderStatusHistory OrderStatusHistory[]
+
+  @@index([orderId])
 }
 
 enum OrderStatus {

@@ -6,6 +6,7 @@ import { PrismaService } from 'src/common/services/prisma.service';
 import { ChangeOrderStatusUseCase } from './application/use-cases/change-order-status';
 import { ValidateOrderUpdateUseCase } from './application/use-cases/validate-order-update';
 import { ProductsModule } from 'src/products/products.module';
+import { OrderIdGeneratorService } from './application/services/order-id-generator.service';
 
 @Module({
   imports: [ProductsModule],
@@ -14,6 +15,7 @@ import { ProductsModule } from 'src/products/products.module';
     PrismaService,
     ChangeOrderStatusUseCase,
     ValidateOrderUpdateUseCase,
+    OrderIdGeneratorService,
     {
       provide: ORDERS_REPOSITORY,
       useClass: OrdersRepository,
