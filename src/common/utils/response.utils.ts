@@ -1,6 +1,7 @@
 import { ZodError } from 'zod';
 import {
   ErrorResponse,
+  PaginationResponse,
   SuccessResponse,
   ValidationError,
 } from '../types/api-reponse.types';
@@ -40,5 +41,34 @@ export class ResponseUtils {
     }));
 
     return this.error(message, errors);
+  }
+
+  static paginated<T>(
+    data: T[],
+    total: number,
+    page: number,
+    pageSize: number,
+    message: string = 'Data retrieved successfully',
+  ): PaginationResponse<T> {
+    const validPageSize = pageSize <= 0 ? 1 : pageSize;
+
+    const totalPages = total === 0 ? 0 : Math.ceil(total / validPageSize);
+
+    const hasNextPage = page < totalPages;
+    const hasPreviousPage = page > 1;
+
+    return {
+      data,
+      success: true,
+      message,
+      pagination: {
+        total,
+        page,
+        pageSize: validPageSize,
+        totalPages,
+        hasNextPage,
+        hasPreviousPage,
+      },
+    };
   }
 }
