@@ -112,12 +112,17 @@ export class OrdersRepository implements IOrdersRepository {
   }
 
   async getOrderById(id: string): Promise<Order | null> {
-    return this.prisma.order.findUnique({
+    const order = await this.prisma.order.findUnique({
       where: { id },
       include: {
         product: true,
       },
     });
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return order;
   }
 
   async updateOrder(id: string, data: UpdateOrder): Promise<Order> {
