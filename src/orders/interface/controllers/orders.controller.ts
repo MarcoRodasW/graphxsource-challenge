@@ -23,7 +23,6 @@ import {
   CreateOrderDTO,
   GetOrdersQueryDTO,
   OrderDTO,
-  OrderStatus,
   UpdateOrderDTO,
   UpdateOrderStatusDTO,
 } from '../dtos/orders.dto';
@@ -108,10 +107,7 @@ export class OrdersController {
     @Param('id') id: string,
     @Body() updateOrderStatusDTO: UpdateOrderStatusDTO,
   ) {
-    return this.ordersRepository.changeOrderStatus(
-      id,
-      updateOrderStatusDTO.orderStatus as OrderStatus,
-    );
+    return this.ordersRepository.changeOrderStatus(id, updateOrderStatusDTO);
   }
 
   @Delete('/:id')
