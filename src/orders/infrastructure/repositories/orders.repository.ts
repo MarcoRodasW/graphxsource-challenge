@@ -8,6 +8,7 @@ import {
   Order,
   OrderStatus,
   UpdateOrder,
+  UpdateOrderStatus,
 } from 'src/orders/interface/dtos/orders.dto';
 import type { OrderStatusHistory } from 'src/orders/interface/dtos/order-status-history.dto';
 import { ChangeOrderStatusUseCase } from 'src/orders/application/use-cases/change-order-status';
@@ -17,6 +18,8 @@ import { PRODUCTS_REPOSITORY } from 'src/products/domain/products.repository.int
 import { OrderIdGeneratorService } from 'src/orders/application/services/order-id-generator.service';
 import type { PaginationResponse } from 'src/common/types/api-reponse.types';
 import { ResponseUtils } from 'src/common/utils/response.utils';
+import { WebhookService } from 'src/common/services/webhook.service';
+import { OrderWebhookHelper } from '../webhooks/order-webhook.helper';
 
 @Injectable()
 export class OrdersRepository implements IOrdersRepository {
@@ -27,6 +30,7 @@ export class OrdersRepository implements IOrdersRepository {
     @Inject(PRODUCTS_REPOSITORY)
     private readonly productsRepository: IProductsRepository,
     private readonly orderIdGenerator: OrderIdGeneratorService,
+    private readonly webhookService: WebhookService,
   ) {}
 
   async createOrder(data: CreateOrder): Promise<Order> {
@@ -155,8 +159,9 @@ export class OrdersRepository implements IOrdersRepository {
 
   async changeOrderStatus(
     id: string,
-    orderStatus: OrderStatus,
+    changeStatusPayload: UpdateOrderStatus,
   ): Promise<Order> {
+    const { comments, orderStatus } = changeStatusPayload;
     const order = await this.prisma.order.findUnique({
       where: { id },
     });
@@ -166,13 +171,13 @@ export class OrdersRepository implements IOrdersRepository {
 
     this.changeOrderStatusUseCase.validateTransition(
       order.orderStatus as OrderStatus,
-      orderStatus,
+      orderStatus as OrderStatus,
     );
 
-    return await this.prisma.$transaction(async (tx) => {
-      const updatedOrder = await tx.order.update({
+    const updatedOrder = await this.prisma.$transaction(async (tx) => {
+      const updated = await tx.order.update({
         where: { id: order.id },
-        data: { orderStatus },
+        data: { orderStatus, comments },
       });
 
       await tx.orderStatusHistory.create({
@@ -183,8 +188,18 @@ export class OrdersRepository implements IOrdersRepository {
         },
       });
 
-      return updatedOrder;
+      return updated;
     });
+
+    if (OrderWebhookHelper.shouldTriggerWebhook(orderStatus)) {
+      const webhookEvent = OrderWebhookHelper.createOrderStatusEvent(
+        updatedOrder,
+        'order.status.changed',
+      );
+      await this.webhookService.sendWebhook(webhookEvent);
+    }
+
+    return updatedOrder;
   }
 
   async getOrderStatusHistory(orderId: string): Promise<OrderStatusHistory[]> {
